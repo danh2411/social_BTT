@@ -21,7 +21,8 @@ return new class extends Migration
             $table->string('avatar_url')->nullable();
             $table->text('address')->nullable();
             $table->date('date_of_birth')->nullable();
-            $table->integer('status')->default(0);
+            $table->integer('role')->default(0); // 0 - user, 1 - admin
+            $table->integer('status')->default(0); // 0 - no active, 1 - active
             $table->rememberToken();
             $table->timestamps();
         });

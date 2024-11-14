@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Modules\User\Providers;
+use App\Modules\User\Services\Interfaces\UserServiceInterface;
+use App\Modules\User\Services\UserService;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,7 +17,13 @@ class UserServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerApiRoutes($this->controllerNamespace, __DIR__ . '/../Routes/api.php');
+
         $this->loadMigrationsFrom(__DIR__ . '/../Migrations');
+
+
+
+
+        $this->app->bind(UserServiceInterface::class, UserService::class);
     }
 
     /**

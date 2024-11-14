@@ -13,13 +13,16 @@ trait ResponseTrait
      * @param int $statusCode
      * @return \Illuminate\Http\JsonResponse
      */
-    public static function responseJsonSuccess($data = null, string $message = 'Operation successful', int $statusCode = 200)
+    public static function responseJsonSuccess($data = null, string $message = 'Operation successful',$meta=null, int $statusCode = 200): \Illuminate\Http\JsonResponse
     {
         return response()->json([
             'success' => true,
             'message' => $message,
-            'data' => $data
+            'data' => $data,
+            'meta' => $meta,
+            'errors' => null,
         ], $statusCode);
+
     }
 
     /**
@@ -35,7 +38,9 @@ trait ResponseTrait
         return response()->json([
             'success' => false,
             'message' => $message,
-            'errors' => $errors
+            'data' => null,
+            'meta' => null,
+            'errors' => $errors,
         ], $statusCode);
     }
 }

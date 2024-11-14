@@ -37,6 +37,7 @@ class ModuleServiceProvider extends ServiceProvider
 
     protected function registerProviders(array $providers)
     {
+
         foreach ($providers as $provider) {
             $this->app->register($provider);
         }
