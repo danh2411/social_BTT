@@ -3,16 +3,50 @@
 namespace App\Modules\User\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Foundation\Application;
+use App\Modules\User\Services\Interfaces\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
+
 
 class UserController extends Controller
 {
-    public function test(Request $request)
+    protected $userService;
+    public function __construct(UserServiceInterface $userService)
     {
-       dd(11111);
+        $this->userService = $userService;
+    }
+
+    public function listUsers(Request $request): JsonResponse
+    {
+        $users = $this->userService->getAllUsers();
+        return $this->responseJsonSuccess($users,'Fetched users successfully');
+
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getUserByID($id): JsonResponse
+    {
+        try {
+            $user = $this->userService->getUserById($id);
+            return $this->responseJsonSuccess($user,'Fetched users successfully');
+        } catch (\Exception $e) {
+            return $this->responseJsonError('User not found', 404);
+        }
+    }
+
+    public function createUser(Request $request): JsonResponse
+    {
+        try {
+            $data = $request->all();
+            $user = $this->userService->createUser($data);
+            return $this->responseJsonSuccess($user,'User created successfully', 201);
+
+        } catch (\Exception $e) {
+            return $this->responseJsonError('Failed to create user', 500);
+
+        }
     }
 }

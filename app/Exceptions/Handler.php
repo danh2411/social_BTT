@@ -62,7 +62,7 @@ class Handler extends ExceptionHandler
             if ($request->expectsJson()
                 || str_starts_with(
                     $request->url(),
-                    $request->getSchemeAndHttpHost() . '/' . env('APP_API_PREFIX', 'api/front')
+                    $request->getSchemeAndHttpHost() . '/' . env('APP_API_PREFIX', 'api')
                 ) !== false
             ) {
                 return response()->json([
