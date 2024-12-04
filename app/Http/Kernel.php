@@ -2,6 +2,8 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\CheckRoleMiddleware;
+use App\Http\Middleware\UserMiddleware;
 use  Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -58,7 +60,10 @@ class Kernel extends HttpKernel
             'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
             'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
             'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            'auth' => \Illuminate\Auth\Middleware\Authenticate::class,
             'auth:api' => \Illuminate\Auth\Middleware\Authenticate::class, // Thêm auth:api vào đây
+            'check_role' => CheckRoleMiddleware::class, // Thêm auth:api vào đây
+            'user'=>UserMiddleware::class,
 //        'cors' => \App\Http\Middleware\CorsMiddleware::class
         ];
 }

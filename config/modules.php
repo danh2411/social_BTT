@@ -4,11 +4,38 @@ return [
         'user' => [
             'active' => true,
             'providers' => [
-               \App\Modules\User\Providers\UserServiceProvider::class,
+                \App\Modules\User\Providers\UserServiceProvider::class,
             ],
-            'modules_require'=> [
+            'modules_require' => [
 
             ]
         ],
-        ]
-    ];
+        'newsletter' => [
+            'active' => true,
+            'providers' => [
+                \App\Modules\Newsletter\Providers\NewsletterServiceProvider::class,
+            ],
+            'modules_require' => [
+
+            ]
+        ],
+        'resource' => [
+            'active' => true,
+            'providers' => [
+                \App\Modules\Resources\Providers\ResourceServiceProvider::class,
+            ],
+            'modules_require' => [
+
+            ]
+        ],
+        'brand' => [
+            'active' => true,
+            'providers' => [
+                \App\Modules\Brands\Providers\BrandServiceProvider::class,
+            ],
+            'modules_require' => [
+
+            ]
+        ],
+    ]
+];

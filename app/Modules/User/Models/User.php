@@ -2,6 +2,7 @@
 
 namespace App\Modules\User\Models;
 
+use App\Modules\Newsletter\Models\Newsletter;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -23,6 +24,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'phone',
+        'role',
         'avatar_url',
         'address',
         'date_of_birth',
@@ -67,5 +69,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+    // Mối quan hệ 1-nhiều với bảng newsletters
+    public function newsletters()
+    {
+        return $this->hasMany(Newsletter::class);
     }
 }

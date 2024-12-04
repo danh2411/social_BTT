@@ -56,6 +56,14 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
+            'google' => [
+                'driver' => 'custom',
+                'via' => \App\Services\GoogleDriveAdapter::class,
+                'client_id' => env('GOOGLE_DRIVE_CLIENT_ID'),
+                'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
+                'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
+                'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID'), // ID của thư mục Google Drive
+            ],
 
     ],
 

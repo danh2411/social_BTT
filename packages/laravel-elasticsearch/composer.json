@@ -1,0 +1,29 @@
+{
+    "name": "paz/laravel-elasticsearch",
+    "description": "description",
+    "minimum-stability": "dev",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "danh2411",
+            "email": "ngodanh12345@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "laravel/framework": "^11.9",
+        "elasticsearch/elasticsearch": "^7.17"
+    },
+    "autoload": {
+        "psr-4": {
+            "paz\\Elasticsearch\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "paz\\Elasticsearch\\Providers\\ElasticsearchServiceProvider"
+            ]
+        }
+    }
+}

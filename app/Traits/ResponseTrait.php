@@ -21,7 +21,7 @@ trait ResponseTrait
             'data' => $data,
             'meta' => $meta,
             'errors' => null,
-        ], $statusCode);
+        ],  $statusCode,['Content-Type' => 'application/json; charset=UTF-8'], JSON_UNESCAPED_UNICODE);
 
     }
 
@@ -41,7 +41,7 @@ trait ResponseTrait
             'data' => null,
             'meta' => null,
             'errors' => $errors,
-        ], $statusCode);
+        ], $statusCode,['Content-Type' => 'application/json; charset=UTF-8'], JSON_UNESCAPED_UNICODE);
     }
 }
 

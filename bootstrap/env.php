@@ -11,3 +11,5 @@ Dotenv::create(
 
 app()->useEnvironmentPath(base_path('env'));
 app()->loadEnvironmentFrom('.env_' . env('APP_ENV', 'local'));
+
+Dotenv::createImmutable(base_path('env'), app()->environmentFile())->safeLoad();

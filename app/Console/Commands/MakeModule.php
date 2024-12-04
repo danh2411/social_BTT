@@ -20,15 +20,18 @@ class MakeModule extends Command
 
         // Tạo các thư mục con
         $directories = [
-            'Controllers',
+            'Http/Middleware',
+            'Http/Requests',
+            'Http/Controllers',
             'Config',
             'Console',
             'Models',
             'Requests',
             'Routes',
-            'Middleware',
             'Migrations',
-            'Providers'
+            'Repositories/Interfaces',
+            'Providers',
+            'Services/Interfaces',
         ];
 
         foreach ($directories as $dir) {
@@ -55,6 +58,11 @@ class MakeModule extends Command
         $routeFile = "{$modulePath}/Providers/" . $moduleName . "ServiceProvider.php";
         File::put($routeFile, "<?php\n\n// Providers for {$moduleName} module\n");
 
+        // Tạo file Providers API
+        $routeFile = "{$modulePath}/Services/Interfaces/" . $moduleName . "ServiceInterface.php";
+        File::put($routeFile, "<?php\n\nnamespace App\Modules\\{$moduleName}\Services\Interfaces;\n\ninterface {$moduleName}ServiceInterface\n{\n    //\n}\n");
+        $routeFile = "{$modulePath}/Services/" . $moduleName . "Service.php";
+        File::put($routeFile, "<?php\n\nnamespace App\Modules\\{$moduleName}\Services;\n\nclass {$moduleName}Service extends {$moduleName}ServiceInterface\n{\n    //\n}\n");
 
         $this->info("Module {$moduleName} đã được tạo thành công!");
     }

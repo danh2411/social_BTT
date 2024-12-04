@@ -143,8 +143,13 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
+        //đăng ký các modules
         \App\Providers\ModuleServiceProvider::class,
         \App\Providers\RouteServiceProvider::class,
+
+        //đăng ký provider rabbitmq
+        App\Providers\RabbitMQServiceProvider::class,
+
     ],
 
 

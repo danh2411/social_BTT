@@ -4,6 +4,7 @@ namespace App\Modules\User\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\User\Http\Requests\CreateUserRequest;
+use App\Modules\User\Http\Requests\UpdateUserRequest;
 use App\Modules\User\Services\Interfaces\UserServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -44,9 +45,11 @@ class UserController extends Controller
 
     public function createUser(CreateUserRequest $request): JsonResponse
     {
+
         try {
             $data = $request->validated();
             $data['password'] = Hash::make($data['password']);
+
             $user = $this->userService->createUser($data);
             return $this->responseJsonSuccess($user, 'User created successfully',null ,201);
 
@@ -59,6 +62,44 @@ class UserController extends Controller
             return $this->responseJsonError('Failed to create user: ' . $e->getMessage(), 500);
         }
     }
+
+    /**
+     * Update user information.
+     *
+     * @param UpdateUserRequest $request
+     * @return JsonResponse
+     */
+    public function updateUser(UpdateUserRequest $request): JsonResponse
+    {
+
+        try {
+            // Lấy tất cả dữ liệu đã validated
+            $data = $request->validated();
+
+            // Gọi service để xử lý cập nhật
+            $user = $this->userService->updateUser($data['id'],$data);
+
+            // Trả về phản hồi thành công
+            return $this->responseJsonSuccess($user, 'User updated successfully', null, 200);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Xử lý lỗi truy vấn (ví dụ: trùng email)
+            return $this->responseJsonError('Database error: ' . $e->getMessage(), 500);
+        } catch (\Exception $e) {
+            // Xử lý các lỗi khác
+            return $this->responseJsonError('Failed to update user: ' . $e->getMessage(), 500);
+        }
+    }
+    public function verifyUser(UpdateUserRequest $request): JsonResponse
+    {
+            $data = $request->all();
+            $user = $this->userService->verifyUser($data);
+            if ($user['success']) {
+                return $this->responseJsonSuccess($user, 'User verified successfully', null, 200);
+            }
+        return $this->responseJsonSuccess($user, 'User verified failed', null, 200);
+
+    }
+
     public function login(Request $request): JsonResponse
     {
         // Xác thực thông tin đăng nhập
@@ -67,14 +108,16 @@ class UserController extends Controller
         // Lấy thông tin người dùng đã xác thực
         $result= $this->userService->login($credentials);
         if (!empty($result['success']) && $result['success'] === true) {
-            $response=[
-                'token' => $result['token']??[],
-                'token_type' => 'bearer',
-            $result['user']??[],
-            ];
+            $response = array_merge(
+                [
+                    'token' => $result['token'] ?? [],
+                    'token_type' => 'bearer',
+                ],
+                $result['data'] ?? []
+            );
             return $this->responseJsonSuccess($response,'Login successful');
         }
-        return $this->responseJsonError($result, 'Invalid credentials', 404);
+        return $this->responseJsonError($result['message']??'Login failed', 404,$result['message']??'Login failed');
     }
     public function getUserByToken(): JsonResponse
     {
@@ -88,15 +131,11 @@ class UserController extends Controller
             ], 401);
         }
         $result= $this->userService->getUserByToken();
-        dd($result);
+
         if (!empty($result['success']) && $result['success'] === true) {
-            $response=[
-                'token' => $result['token']??[],
-                'token_type' => 'bearer',
-                $result['user']??[],
-            ];
+            $response= $result['data']??[];
             return $this->responseJsonSuccess($response,'Login successful');
         }
-        return $this->responseJsonError($result, 'Invalid credentials', 401);
+        return $this->responseJsonError($result['message']??'Login failed',  401,$result['message']??'Login failed');
     }
 }
