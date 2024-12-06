@@ -21,6 +21,9 @@ class Resources extends CoreIndex
             'resource_id' => [
                 'type' => 'keyword', // Loại tài nguyên (thumbnail, avatar, etc.), không cần phân tích
             ],
+            'id' => [
+                'type' => 'keyword', // Loại tài nguyên (thumbnail, avatar, etc.), không cần phân tích
+            ],
             'type' => [
                 'type' => 'keyword', // Loại tài nguyên (thumbnail, avatar, etc.), không cần phân tích
             ],

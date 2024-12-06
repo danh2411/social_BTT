@@ -2,17 +2,17 @@
 
 namespace App\Console\QueueHandlers;
 
-use App\Modules\Brands\Models\Brand;
-use App\Modules\Brands\Repositories\Interfaces\BrandRepository;
+use App\Modules\Brand\Models\Brand;
+use App\Modules\Brand\Repositories\Elasticsearch\Interfaces\BrandRepositoryInterface;
 use App\Services\RabbitMQService;
 use Illuminate\Support\Facades\Log;
 
 class BrandQueueHandler
 {
     public function __construct(
-        protected BrandRepository $brandRepository,
-        protected RabbitMQService    $rabbitMQ,
-        $command = null // Truyền command
+        protected BrandRepositoryInterface $brandRepository,
+        protected RabbitMQService          $rabbitMQ,
+                                           $command = null // Truyền command
     )
     {
         $this->command = $command;

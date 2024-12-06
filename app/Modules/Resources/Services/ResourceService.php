@@ -101,7 +101,7 @@ class ResourceService implements ResourceServiceInterface
     public function updateResource($data)
     {
 
-        $search_resource=$this->resourceRepository->findByAttributes(['resource_id'=>$data['resource_id']??'']);
+        $search_resource=$this->resourceRepository->findByAttributes(['id'=>$data['id']??'']);
 
         // Kiểm tra nếu không tìm thấy tài nguyên
         if (empty($search_resource)) {

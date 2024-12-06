@@ -31,7 +31,7 @@ return [
         'brand' => [
             'active' => true,
             'providers' => [
-                \App\Modules\Brands\Providers\BrandServiceProvider::class,
+                \App\Modules\Brand\Providers\BrandServiceProvider::class,
             ],
             'modules_require' => [
 

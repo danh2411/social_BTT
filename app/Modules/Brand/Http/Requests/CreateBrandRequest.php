@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Modules\Resources\Http\Requests;
+namespace App\Modules\Brand\Http\Requests;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
-
-class CreateResourceRequest extends FormRequest
+use Illuminate\Validation\Rule;
+class CreateBrandRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,17 +24,14 @@ class CreateResourceRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'required|string|max:255', // Loại tài nguyên
-            'resourceable_id' => 'nullable|integer', // ID của bản ghi liên quan
-            'resourceable_type' => 'nullable|string|max:255', // Loại đối tượng liên kết
-            'name' => 'nullable|string|max:255',
-            'image' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048', // Đường dẫn tài nguyên
-            'description' => 'nullable|string', // Mô tả tài nguyên
-            'meta_data' => 'nullable|array', // Dữ liệu meta
-            'option' => 'nullable|string|max:255', // Dữ liệu meta khác
+            'page' => 'integer|nullable',
+            'per_page' => 'integer|nullable',
+            'name' => 'required|string|max:255',
+            'description' => 'sometime|string',
+            'date_released' => 'nullable|date_format:d-m-Y',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Nếu tải lên ảnh mới
         ];
     }
-
 
     /**
      * Custom messages for validation errors.
@@ -44,8 +41,8 @@ class CreateResourceRequest extends FormRequest
     public function messages()
     {
         return [
-            'type.required' => 'Loại tài nguyên là bắt buộc (thumbnail, avatar, gallery, video, etc.).',
-            'path.required' => 'Đường dẫn tài nguyên là bắt buộc.',
+            'thumbnail.exists' => 'Thumbnail không hợp lệ hoặc không tồn tại.',
+            'thumbnail_file.image' => 'File tải lên phải là hình ảnh.',
         ];
     }
 
