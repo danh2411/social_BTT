@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('resources', function (Blueprint $table) {
             $table->id();
             $table->string('type'); // Loại tài nguyên (thumbnail, avatar, gallery, video, etc.)
-            $table->unsignedBigInteger('resourceable_id'); // ID của bản ghi liên quan
-            $table->string('resourceable_type'); // Loại đối tượng liên kết (brands, switches, keycaps, etc.)
+            $table->unsignedBigInteger('resourceable_id')->nullable(); // ID của bản ghi liên quan
+            $table->string('resourceable_type')->nullable(); // Loại đối tượng liên kết (brands, switches, keycaps, etc.)
             $table->string('path'); // Đường dẫn đến tài nguyên
             $table->text('description')->nullable(); // Mô tả tài nguyên
             $table->json('meta_data')->nullable(); // Dữ liệu meta (kích thước, định dạng, etc.)

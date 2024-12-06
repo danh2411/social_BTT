@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Modules\Brand\Models\Brand;
 use App\Modules\Brand\Models\Brands;
 use App\Modules\Brands\Repositories\Interfaces\BrandRepository;
-use App\Modules\Brands\Services\Interfaces\BrandServiceInterface;
+use App\Modules\Brands\Services\Interfaces\KeyCapServiceInterface;
 use App\Services\RabbitMQService;
 use App\Services\GoogleDriveService;
 use Illuminate\Http\JsonResponse;
@@ -17,10 +17,10 @@ class BrandController extends Controller
 {
 
     public function __construct(
-        protected BrandRepository       $brandRepository,
-        protected BrandServiceInterface $brandService,
-        protected RabbitMQService            $rabbitMQ,
-        protected GoogleDriveService  $driveService,
+        protected BrandRepository        $brandRepository,
+        protected KeyCapServiceInterface $brandService,
+        protected RabbitMQService        $rabbitMQ,
+        protected GoogleDriveService     $driveService,
     ){
 
     }

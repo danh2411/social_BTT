@@ -8,8 +8,8 @@ use App\Indexes\Resources;
 use App\Modules\Brands\Repositories\BrandRepository;
 use App\Modules\Brands\Repositories\Interfaces\BrandRepository as BrandRepositoryInterface;
 
-use App\Modules\Brands\Services\BrandService;
-use App\Modules\Brands\Services\Interfaces\BrandServiceInterface;
+use App\Modules\Brands\Services\KeyCapService;
+use App\Modules\Brands\Services\Interfaces\KeyCapServiceInterface;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -33,7 +33,7 @@ class BrandServiceProvider extends ServiceProvider
             return new BrandRepository(new Brands());
         });
 
-        $this->app->bind(BrandServiceInterface::class, BrandService::class);
+        $this->app->bind(KeyCapServiceInterface::class, KeyCapService::class);
     }
 
     /**

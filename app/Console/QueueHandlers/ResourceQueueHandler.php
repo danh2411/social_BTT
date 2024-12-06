@@ -2,9 +2,8 @@
 
 namespace App\Console\QueueHandlers;
 
-use App\Modules\Newsletter\Models\Newsletter;
-use App\Modules\Resources\Models\Resources;
-use App\Modules\Resources\Repositories\Interfaces\ResourceRepository;
+use App\Modules\Resources\Repositories\Elasticsearch\Interfaces\ESResourceRepository;
+use App\Modules\Resources\Repositories\Mysql\Interfaces\MysqlResourceRepository;
 use App\Services\GoogleDriveService;
 use App\Services\RabbitMQService;
 use Illuminate\Support\Facades\Log;
@@ -12,20 +11,23 @@ use Illuminate\Support\Facades\Log;
 class ResourceQueueHandler
 {
     public function __construct(
-        protected ResourceRepository $resourceRepository,
-        protected RabbitMQService    $rabbitMQ,
-        protected GoogleDriveService $driveService,
-        $command = null // Truyền command
+        protected ESResourceRepository    $resourceRepository,
+        protected RabbitMQService         $rabbitMQ,
+        protected GoogleDriveService      $driveService,
+        protected MysqlResourceRepository $resourceMysql,
+                                          $command = null // Truyền command
     )
     {
         $this->command = $command;
     }
+
     protected $actionMap = [
         'create' => 'handleCreate',
         'update' => 'handleUpdate',
         'delete' => 'handleDelete',
     ];
-    public function handle( $data)
+
+    public function handle($data)
     {
 
         if (!isset($data['action']) || !isset($this->actionMap[$data['action']])) {
@@ -49,14 +51,11 @@ class ResourceQueueHandler
         }
 
         try {
-            $resource = new Resources();
-            $resource->fill($data);
-            $resource->save();
-
+            $resource = $this->resourceMysql->create($data);
             $data_update_es = [
                 'id' => $data['id'],
-                'resource_id' => $resource->id,
-                'updated_at' => strtotime($resource->updated_at),
+                'resource_id' => $resource->getAttribute('id'),
+                'updated_at' => strtotime($resource->getAttribute('updated_at')),
             ];
 
             $update = $this->resourceRepository->update($data_update_es);
@@ -82,10 +81,40 @@ class ResourceQueueHandler
     }
 
 
+    protected function handleUpdate(array $data)
+    {
+        try {
+            $resource = $this->resourceMysql->update($data['id'],$data);
+            $data_update_es = [
+                'id' => $data['id_es'],
+                'updated_at' => strtotime($resource->getAttribute('updated_at')),
+            ];
 
-    protected function handleUpdate(array $data) {
+            $update = $this->resourceRepository->update($data_update_es);
+
+            if ($update) {
+                // Hiển thị thông báo thành công tiếng Việt
+                $this->command?->info("Tạo tài nguyên Cập nhật với MySQL ID: {$resource->id} và Elasticsearch ID: {$data['id']}");
+
+            } else {
+                // Hiển thị lỗi tiếng Việt trên console
+                $this->command?->error("Cập nhật Elasticsearch thất bại cho MySQL ID: {$resource->id}");
+
+                // Ghi log lỗi bằng tiếng Anh
+                \Log::error("Failed to update Elasticsearch for MySQL ID: {$resource->id}");
+            }
+        } catch (\Exception $e) {
+            // Hiển thị lỗi tiếng Việt
+            $this->command?->error('Có lỗi xảy ra khi xử lý tạo tài nguyên: ' . $e->getMessage());
+
+            // Ghi log lỗi tiếng Anh
+            \Log::error('Error handling create resource: ' . $e->getMessage());
+        }
 
     }
-    protected function handleDelete(array $data) { /* ... */ }
+
+    protected function handleDelete(array $data)
+    { /* ... */
+    }
 
 }

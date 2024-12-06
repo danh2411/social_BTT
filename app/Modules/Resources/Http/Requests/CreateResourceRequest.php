@@ -24,13 +24,14 @@ class CreateResourceRequest extends FormRequest
     public function rules()
     {
         return [
-            'type' => 'required|string|max:255', // Loại tài nguyên
-            'resourceable_id' => 'required|integer', // ID của bản ghi liên quan
-            'resourceable_type' => 'required|string|max:255', // Loại đối tượng liên kết
-            'path' => 'required|string|max:255', // Đường dẫn tài nguyên
-            'description' => 'sometime|string', // Mô tả tài nguyên
-            'meta_data' => 'sometime|array', // Dữ liệu meta
-            'option' => 'sometime|string|max:255', // Dữ liệu meta khác
+            'type' => 'requiredrequired|string|max:255', // Loại tài nguyên
+            'resourceable_id' => 'nullable|integer', // ID của bản ghi liên quan
+            'resourceable_type' => 'nullable|string|max:255', // Loại đối tượng liên kết
+            'name' => 'nullable|string|max:255',
+            'image' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048', // Đường dẫn tài nguyên
+            'description' => 'nullable|string', // Mô tả tài nguyên
+            'meta_data' => 'nullable|array', // Dữ liệu meta
+            'option' => 'nullable|string|max:255', // Dữ liệu meta khác
         ];
     }
 
@@ -44,8 +45,6 @@ class CreateResourceRequest extends FormRequest
     {
         return [
             'type.required' => 'Loại tài nguyên là bắt buộc (thumbnail, avatar, gallery, video, etc.).',
-            'resourceable_id.required' => 'ID của bản ghi liên quan là bắt buộc.',
-            'resourceable_type.required' => 'Loại đối tượng liên kết là bắt buộc(brands, switches, keycaps, etc.).',
             'path.required' => 'Đường dẫn tài nguyên là bắt buộc.',
         ];
     }

@@ -4,7 +4,8 @@ namespace App\Modules\Resources\Services;
 
 
 use App\Modules\Resources\Models\Resources;
-use App\Modules\Resources\Repositories\Interfaces\ResourceRepository;
+use App\Modules\Resources\Repositories\Elasticsearch\Interfaces\ESResourceRepository;
+use App\Modules\Resources\Repositories\Mysql\Interfaces\MysqlResourceRepository;
 use App\Modules\Resources\Services\Interfaces\ResourceServiceInterface;
 use App\Services\GoogleDriveService;
 use App\Services\RabbitMQService;
@@ -12,9 +13,10 @@ use App\Services\RabbitMQService;
 class ResourceService implements ResourceServiceInterface
 {
     public function __construct(
-        protected ResourceRepository $resourceRepository,
-        protected RabbitMQService    $rabbitMQ,
-        protected GoogleDriveService $driveService,
+        protected ESResourceRepository $resourceRepository,
+        protected RabbitMQService      $rabbitMQ,
+        protected GoogleDriveService   $driveService,
+        protected  MysqlResourceRepository $resourceMysqlRepository,
 
     )
     {
@@ -24,15 +26,17 @@ class ResourceService implements ResourceServiceInterface
     public function createResource($data)
     {
 
-        $file = $data['thumbnail'];
+        $file = $data['image'];
         $fileId = $this->driveService->uploadFile($file->path(), $file->getClientOriginalName());
         $thumbnailUrl = $this->driveService->getFileUrl($fileId);
         $data_save = [
             'type'=>$data['type']??'thumbnail',
+            'name'=>$data['name']??null,
             'resourceable_id'=>$data['resourceable_id']??null,
             'resourceable_type'=>$data['resourceable_type']??null,
             'description'=>$data['description']??null,
-            'thumbnail'=>$thumbnailUrl,
+            'path'=>$thumbnailUrl,
+            'status'=>1,
             'created_at'=>time(),
             'resource_id'=>time()
         ];
@@ -58,8 +62,8 @@ class ResourceService implements ResourceServiceInterface
             'message' => 'Lưu tài nguyên  thành công',
         ];
 
-
     }
+
     public function listResource($data){
 
         $param = [
@@ -67,8 +71,13 @@ class ResourceService implements ResourceServiceInterface
             'number' =>!empty($data['per_page'])?  (int)$data['per_page'] : 10,
             'sort' => ['created_at' => 'desc'],
             'filter' =>[],
+            'must_not' =>[
+                'match'=>['status'=>0],
+            ],
             'must' => array_values(array_filter([
                 !empty($data['type']) ? ['match' => ['type' => $data['type']]] : null,
+                !empty($data['id']) ? ['match' => ['id' => $data['id']]] : null,
+
                 !empty($data['resourceable_id']) ? ['match' => ['resourceable_id' => $data['resourceable_id']]] : null,
                 !empty($data['resourceable_type']) ? ['match' => ['resourceable_type' => $data['resourceable_type']]] : null,
                 !empty($data['resource_id']) ? ['match' => ['resource_id' => $data['resource_id']]] : null,
@@ -87,5 +96,54 @@ class ResourceService implements ResourceServiceInterface
             'message' => 'Danh sách tài nguyên ',
             'data'=>$search_resource,
         ];
+    }
+
+    public function updateResource($data)
+    {
+
+        $search_resource=$this->resourceRepository->findByAttributes(['resource_id'=>$data['resource_id']??'']);
+
+        // Kiểm tra nếu không tìm thấy tài nguyên
+        if (empty($search_resource)) {
+            return [
+                'success' => false,
+                'message' => 'Tài nguyên không tồn tại.',
+            ];
+        }
+        // Giả sử chúng ta lấy được tài nguyên đầu tiên từ kết quả tìm kiếm
+        $resource = $search_resource['_source']; // hoặc có thể xử lý theo yêu cầu của bạn
+
+        // Cập nhật các trường cần thiết, ví dụ: type, resourceable_id, resourceable_type, v.v.
+        $updated_data = [
+            'id'=>$resource['id'],
+            'type' => !empty($data['type']) ? $data['type'] : $resource['type'],
+            'name' => !empty($data['name']) ? $data['name'] : $resource['name'],
+            'resourceable_id' => !empty($data['resourceable_id']) ? $data['resourceable_id'] : $resource['resourceable_id'],
+            'resourceable_type' => !empty($data['resourceable_type']) ? $data['resourceable_type'] : $resource['resourceable_type'],
+            'description' => !empty($data['description']) ? $data['description'] : $resource['description'],
+            'updated_at'=>time()
+            // Cập nhật các trường khác theo yêu cầu
+        ];
+
+        // Cập nhật tài nguyên trong Elasticsearch (bạn có thể gọi phương thức update từ repository của bạn)
+        $update_result = $this->resourceRepository->update($updated_data);
+
+        $updated_data['id']=$resource['resource_id'];
+        $updated_data['id_es']=$resource['id'];
+        $this->rabbitMQ->publish('resource_queue', [
+            'action' => 'update',
+            'data' => $updated_data
+        ]);
+        if (!$update_result) {
+            return [
+                'success' => false,
+                'message' => 'Cập nhật tài nguyên không thành công.',
+            ];
+
+        }
+        return [
+        'success' => true,
+        'message' => 'Tài nguyên đã được cập nhật thành công.',
+    ];
     }
 }

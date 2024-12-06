@@ -13,6 +13,9 @@ Route::group(['prefix' => 'api', 'as' => 'api.', 'middleware' => 'user'], functi
 
         Route::get('list-resource', [ResourceController::class, 'listResource'])
             ->name('list.resource');
+
+        Route::put('update-resource', [ResourceController::class, 'updateResource'])
+            ->name('update.resource');
     });
 });
 

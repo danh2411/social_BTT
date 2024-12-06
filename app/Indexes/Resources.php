@@ -30,8 +30,14 @@ class Resources extends CoreIndex
             'resourceable_type' => [
                 'type' => 'keyword', // Loại đối tượng liên kết, không cần phân tích
             ],
+            'name' => [
+                'type' => 'keyword', // Đường dẫn tài nguyên, không cần phân tích
+            ],
             'path' => [
                 'type' => 'keyword', // Đường dẫn tài nguyên, không cần phân tích
+            ],
+            'status' => [
+                'type' => 'keyword', // Dữ liệu bổ sung, có thể là một JSON object
             ],
             'description' => [
                 'type' => 'text', // Mô tả tài nguyên, cần phân tích
