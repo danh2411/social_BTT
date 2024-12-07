@@ -17,7 +17,33 @@ class BrandService implements BrandServiceInterface
     {
 
     }
-
+    public function createBrand($data)
+    {
+        $data_save = [
+            'name'=>$data['name']??1,
+            'description'=>$data['description']??'',
+            'thumbnail'=>$data['thumbnail']??'',
+            'created_at'=>time(),
+            'updated_at'=>time(),
+        ];
+        $saveES = $this->brandRepository->createBrand($data_save);
+        if (!$saveES['success']) {
+            return [
+                'success' => false,
+                'message' => 'Lưu thương hiệu vào es không thành công',
+            ];
+        }
+        $data_save['id']=$saveES['id'];
+        $this->rabbitMQ->publish('brand_queue', [
+            'action' => 'create',
+            'data' => $data_save
+        ]);
+        return [
+            'success' => true,
+            'data' => $data_save,
+            'message' => 'Lưu thương hiệu thành công',
+        ];
+    }
 
     public function listBrand($data): array
     {
