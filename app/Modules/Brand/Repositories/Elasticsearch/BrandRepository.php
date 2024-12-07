@@ -22,4 +22,7 @@ class BrandRepository extends CoreRepository implements  BrandRepositoryInterfac
             return ['success' => false];
         }
     }
+    public function updateBrand($resource){
+            
+    }
 }
